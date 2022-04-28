@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model consumer {
+  aadhar_id       String   @id @db.VarChar(20)
+  consumer_type   String?  @db.Char(5)
+  email           String?
+  consumer_active Boolean?
+  user_all        user_all @relation(fields: [aadhar_id], references: [aadhar_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model farm {
+  farm_id            BigInt     @id
+  farm_name          String?    @default("")
+  longitude          Decimal?   @db.Decimal(10, 7)
+  latitude           Decimal?   @db.Decimal(10, 7)
+  land_area          Float?     @db.Real
+  groundwater_level  Float?     @default(0) @db.Real
+  farm_creation_date DateTime?  @default(dbgenerated("(now())::date")) @db.Date
+  soil_type          String?
+  geo_area_code      String?
+  city               String?
+  district           String?
+  state              String?
+  farm_active        Boolean?   @default(true)
+  producer           producer   @relation(fields: [farm_id], references: [farm_id], onDelete: NoAction, onUpdate: NoAction)
+  sub_area           sub_area[]
+}
+
+model irrigation {
+  sub_area_id     BigInt
+  irrigation_date DateTime @default(dbgenerated("(now())::date")) @db.Date
+  water_amount    Float?   @db.Real
+  water_source    String?
+  data_source     String?
+  sub_area        sub_area @relation(fields: [sub_area_id], references: [sub_area_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([sub_area_id, irrigation_date])
+}
+
+model producer {
+  aadhar_id String   @db.VarChar(20)
+  farm_id   BigInt   @unique @default(autoincrement())
+  user_all  user_all @relation(fields: [aadhar_id], references: [aadhar_id], onDelete: NoAction, onUpdate: NoAction)
+  farm      farm?
+
+  @@id([aadhar_id, farm_id])
+}
+
+model sub_area {
+  sub_area_id            BigInt       @id @default(autoincrement())
+  farm_id                BigInt?
+  sub_area_creation_date DateTime?    @default(dbgenerated("(now())::date")) @db.Date
+  sub_area_size          Float?       @db.Real
+  crop_name              String?
+  seed_id                String?
+  sub_area_active        Boolean?     @default(true)
+  farm                   farm?        @relation(fields: [farm_id], references: [farm_id], onDelete: NoAction, onUpdate: NoAction)
+  irrigation             irrigation[]
+}
+
+model user_all {
+  aadhar_id   String     @id @db.VarChar(20)
+  password    String?
+  name        String?
+  contact_no  String?
+  user_status String?
+  consumer    consumer?
+  producer    producer[]
+}
+
+model weather {
+  weather_date  DateTime @db.Date
+  geo_area_code String
+  temperature   Int?     @db.SmallInt
+  humidity      Float?   @db.Real
+  precipitaion  Float?   @db.Real
+
+  @@id([weather_date, geo_area_code])
+}

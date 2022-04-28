@@ -1,6 +1,6 @@
-# Typescript Node Starter
+# Quiet Sierra Backend
 
-Node.js and express project starter using TypeScript
+Quiet Sierra Node.js Backend, built with Node.js, Express, Prisma and TypeScript
 
 > Note: Need to configure `.env` file to use local server
 
@@ -36,6 +36,28 @@ npm run build
 
 ```bash
 npm start
+```
+
+---
+
+## Prisma Commands
+
+**Prisma Pull**
+
+```bash
+npx prisma db pull
+```
+
+**Prisma Generate**
+
+```bash
+npx prisma generate
+```
+
+**Prisma Studio**
+
+```bash
+npx prisma studio
 ```
 
 ---
